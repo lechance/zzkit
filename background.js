@@ -8,6 +8,7 @@ const DEFAULT_CONFIG = {
   clearCache: true,
   origins: [],
   matchAllUrls: true,
+  theme: 'system',
 };
 
 async function getConfig() {
@@ -108,6 +109,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'updateConfig') {
     saveConfig(message.config).then(async () => {
       await scheduleAlarm(message.config);
+      chrome.tabs.query({}, tabs => {
+        for (const tab of tabs) {
+          chrome.tabs.sendMessage(tab.id, { type: 'themeChanged', theme: message.config.theme }).catch(() => {});
+        }
+      });
       sendResponse({ success: true });
     });
     return true;

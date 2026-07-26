@@ -1,5 +1,7 @@
 function el(id) { return document.getElementById(id); }
 
+let currentTheme = 'system';
+
 async function loadConfig() {
   const resp = await chrome.runtime.sendMessage({ type: 'getConfig' });
   el('enabled').checked = resp.enabled;
@@ -12,11 +14,13 @@ async function loadConfig() {
   el('matchAllUrls').checked = resp.matchAllUrls;
   el('origins').value = (resp.origins || []).join('\n');
   updateUI(resp);
+  currentTheme = resp.theme || 'system';
+  applyTheme(currentTheme);
 }
 
 function updateUI(config) {
   el('statusBadge').textContent = config.enabled ? 'On' : 'Off';
-  el('statusBadge').style.color = config.enabled ? '#4fc3f7' : '#888';
+  el('statusBadge').className = 'badge' + (config.enabled ? ' badge-on' : '');
   el('customOriginsRow').style.display = config.matchAllUrls ? 'none' : 'flex';
 }
 
@@ -35,6 +39,7 @@ function collectConfig() {
     clearCache: el('clearCache').checked,
     matchAllUrls: el('matchAllUrls').checked,
     origins: el('origins').value.split('\n').map(s => s.trim()).filter(Boolean),
+    theme: currentTheme,
   };
 }
 
@@ -42,13 +47,33 @@ el('saveBtn').addEventListener('click', async () => {
   const config = collectConfig();
   await chrome.runtime.sendMessage({ type: 'updateConfig', config });
   updateUI(config);
-  showStatus('Saved ✓', '#4fc3f7');
+  showStatus('Saved ✓', 'var(--accent)');
 });
 
 el('cleanNowBtn').addEventListener('click', async () => {
   await chrome.runtime.sendMessage({ type: 'runCleanupNow' });
   showStatus('Cleaned ✓', '#81c784');
 });
+
+el('themeToggle').addEventListener('click', async () => {
+  const resp = await chrome.runtime.sendMessage({ type: 'getConfig' });
+  const cycle = { system: 'dark', dark: 'light', light: 'off', off: 'system' };
+  const next = cycle[resp.theme] || 'system';
+  await chrome.runtime.sendMessage({ type: 'updateConfig', config: { ...resp, theme: next } });
+  applyTheme(next);
+});
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  const root = document.documentElement;
+  root.classList.remove('force-dark', 'force-light');
+  if (theme === 'dark') root.classList.add('force-dark');
+  else if (theme === 'light') root.classList.add('force-light');
+
+  const btn = el('themeToggle');
+  const labels = { system: 'Auto', dark: '☾ Dark', light: '☀ Light', off: '✕ Off' };
+  btn.textContent = labels[theme] || 'Auto';
+}
 
 function showStatus(msg, color) {
   const s = el('status');
