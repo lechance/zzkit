@@ -73,7 +73,7 @@
 
     themeStyle = document.createElement('style');
     if (theme === 'dark') {
-      themeStyle.textContent = 'html{filter:invert(1)hue-rotate(180deg)!important;background:#ddddd9!important}'
+      themeStyle.textContent = 'html{filter:invert(1)hue-rotate(180deg)!important;background:#ebe1db!important}'
         + 'img,video,canvas,svg,iframe,picture,[style*="background-image"]{filter:invert(1)hue-rotate(180deg)!important}';
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
