@@ -16,7 +16,7 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 |---|---|
 | `manifest.json` | MV3 manifest. Permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`. Host: `<all_urls>`. |
 | `background.js` | Service worker. Stores config in `chrome.storage.sync`. `chrome.alarms` for periodic cleanup. `chrome.browsingData.remove` for data removal. Broadcasts `themeChanged` to all tabs on config save. |
-| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses custom properties with `force-dark`/`force-light` class overrides on `:root`. |
+| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default), `:root.force-light` override, and `@media (prefers-color-scheme: light)` for Auto mode. |
 | `content.js` | Content script on all URLs. Handles `clearTabData` (in-tab cleanup: localStorage, sessionStorage, IndexedDB via `webkitGetDatabaseNames`, cache) and `themeChanged` (applies dark/light/page theme via injected CSS). |
 | `icons/` | PNG icons (16, 48, 128). Optimized with `optipng -o7 -strip all`. |
 
@@ -33,13 +33,13 @@ Cycle: Auto → Dark → Light → Off → Auto.
 | Mode | Popup | Pages |
 |---|---|---|
 | **Auto** | Follows `@media (prefers-color-scheme)` | Follows system `matchMedia` — applies invert filter or color-scheme |
-| **Dark** | `:root.force-dark` | `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`; re-inverts `img,video,canvas,svg,iframe,picture,[style*="background-image"]` |
+| **Dark** | `:root` (default, no forced class needed) | `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`; re-inverts `img,video,canvas,svg,iframe,picture,[style*="background-image"]`; also sets `body{background:#d6d5d2}` to cover pages that only color `<body>` |
 | **Light** | `:root.force-light` | `color-scheme: light` on `<html>` |
 | **Off** | No forced class | Removes all injected CSS, `data-theme`, `color-scheme` |
 
 - Theme broadcasts via **two paths**: `chrome.storage.onChanged` (content script listener) **and** direct `themeChanged` runtime message (background sends to all tabs via `chrome.tabs.query({})`).
 - Content script's `effectiveTheme()` resolves `'system'` via `matchMedia`, and `'off'` returns `'system'` to skip injection.
-- Popup CSS variables are defined in 4 blocks: `:root` (dark default), `:root.force-light`, `:root.force-dark`, and `@media (prefers-color-scheme: light)` (for Auto when system is light).
+- Popup CSS variables are defined in 3 blocks: `:root` (dark default), `:root.force-light`, and `@media (prefers-color-scheme: light)` (for Auto when system is light). The `force-dark` class is still recognized but doesn't need its own block since `:root` is already dark.
 
 ## Version bump convention
 

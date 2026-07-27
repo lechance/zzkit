@@ -1,6 +1,6 @@
 (() => {
   function deleteAllIndexedDB() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const req = indexedDB.webkitGetDatabaseNames
         ? indexedDB.webkitGetDatabaseNames()
         : null;
@@ -73,8 +73,12 @@
 
     themeStyle = document.createElement('style');
     if (theme === 'dark') {
-      themeStyle.textContent = 'html{filter:invert(1)hue-rotate(180deg)!important;background:#ebe1db!important}'
-        + 'img,video,canvas,svg,iframe,picture,[style*="background-image"]{filter:invert(1)hue-rotate(180deg)!important}';
+      const DARK_INVERT = 'filter:invert(1)hue-rotate(180deg)!important';
+      themeStyle.textContent = [
+        `html{${DARK_INVERT};background:#d6d5d2!important}`,
+        `body{background:#d6d5d2!important}`,
+        `img,video,canvas,svg,iframe,picture,[style*="background-image"]{${DARK_INVERT}}`,
+      ].join('');
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
     }
