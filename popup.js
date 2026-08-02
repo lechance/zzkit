@@ -42,7 +42,7 @@ document.querySelectorAll('.tab-btn').forEach((btn) => {
   btn.addEventListener('click', () => switchTab(btn.dataset.tab));
 });
 
-switchTab('clean');
+switchTab('theme');
 
 function collectConfig() {
   return {

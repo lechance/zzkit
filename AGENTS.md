@@ -33,7 +33,7 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 - **Pages:** `themeChanged` message carries `'dark'`/`'light'`; content script injects the invert-filter (dark) or `color-scheme: light` (light) styles.
 - Broadcast via **two paths**: `chrome.storage.onChanged` (content script listener) **and** direct `themeChanged` runtime message (background sends to all tabs via `chrome.tabs.query({})`).
 - The Dark Mode switch **auto-saves** (sends `updateConfig` on toggle); `collectConfig()` reads `#darkModeSwitch`.
-- Popup CSS variables: `:root` (dark default) and `:root.force-light`. Dark injection: `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`, re-inverting `img,video,canvas,svg,iframe,picture,[style*="background-image"]`, plus `body{background:#d6d5d2}` for pages that only color `<body>`.
+- Popup CSS variables: `:root` (dark default) and `:root.force-light`. Dark injection: `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`, re-inverting `img,video,canvas,svg,iframe,picture,embed,object,[style*="background-image"],[role="img"]` and form controls (`input,button,select,textarea`), plus `body{background:#d6d5d2}` for pages that only color `<body>`.
 
 ## Version bump convention
 
@@ -47,7 +47,7 @@ Every commit increments `version` in `manifest.json` by +1 (minor bump). Current
 
 ## Content script notes
 
-- Dark mode injects a `<style>` element with `filter: invert(1) hue-rotate(180deg)`. Removes it on mode change. `!important` prevents page CSS from overriding.
+- Dark mode injects a `<style>` element with `filter: invert(1) hue-rotate(180deg)` on `<html>`, re-inverting media (`img,video,canvas,svg,iframe,picture,embed,object,[style*="background-image"],[role="img"]`) and form controls (`input,button,select,textarea`). Removes it on mode change. `!important` prevents page CSS from overriding.
 - Light mode injects `<style>html{color-scheme:light}</style>`.
 - Both `data-theme` attribute and `color-scheme` inline style are set on `<html>`.
 

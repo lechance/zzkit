@@ -80,12 +80,34 @@
   <h2><span class="zz">Zz</span> zzkit</h2>
 
   <div class="tabs" role="tablist">
-    <button class="tab-btn active" data-tab="clean" role="tab" aria-selected="true">Clean</button>
+    <button class="tab-btn active" data-tab="theme" role="tab" aria-selected="true">Theme</button>
     <button class="tab-btn" data-tab="privacy" role="tab" aria-selected="false">Privacy</button>
-    <button class="tab-btn" data-tab="theme" role="tab" aria-selected="false">Theme</button>
+    <button class="tab-btn" data-tab="clean" role="tab" aria-selected="false">Clean</button>
   </div>
 
-  <div class="tab-panel active" data-panel="clean" role="tabpanel">
+  <div class="tab-panel active" data-panel="theme" role="tabpanel">
+    <div class="row">
+      <span>Dark Mode</span>
+      <label class="switch" title="Toggle dark theme on all pages">
+        <input type="checkbox" id="darkModeSwitch">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-panel="privacy" role="tabpanel">
+    <div class="row">
+      <label for="webrtcPolicy" title="Controls which IP addresses WebRTC may expose (can prevent local/private IP leaks)">WebRTC IP handling</label>
+      <select id="webrtcPolicy">
+        <option value="default">Off (no restriction)</option>
+        <option value="default_public_and_private_interfaces">Use public &amp; private interfaces</option>
+        <option value="default_public_interface_only">Use public interface only</option>
+        <option value="disable_non_proxied_udp">Disable non-proxied UDP</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="tab-panel" data-panel="clean" role="tabpanel">
     <div class="row">
       <label><input type="checkbox" id="enabled"> <strong>Enabled</strong></label>
       <span class="badge" id="statusBadge">Off</span>
@@ -115,28 +137,6 @@
     </div>
 
     <div id="status" style="margin-top:8px; font-size:11px; color:var(--muted); text-align:center;"></div>
-  </div>
-
-  <div class="tab-panel" data-panel="privacy" role="tabpanel">
-    <div class="row">
-      <label for="webrtcPolicy" title="Controls which IP addresses WebRTC may expose (can prevent local/private IP leaks)">WebRTC IP handling</label>
-      <select id="webrtcPolicy">
-        <option value="default">Off (no restriction)</option>
-        <option value="default_public_and_private_interfaces">Use public &amp; private interfaces</option>
-        <option value="default_public_interface_only">Use public interface only</option>
-        <option value="disable_non_proxied_udp">Disable non-proxied UDP</option>
-      </select>
-    </div>
-  </div>
-
-  <div class="tab-panel" data-panel="theme" role="tabpanel">
-    <div class="row">
-      <span>Dark Mode</span>
-      <label class="switch" title="Toggle dark theme on all pages">
-        <input type="checkbox" id="darkModeSwitch">
-        <span class="slider"></span>
-      </label>
-    </div>
   </div>
 
   <script src="popup.js"></script>

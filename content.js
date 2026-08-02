@@ -74,10 +74,12 @@
     themeStyle = document.createElement('style');
     if (theme === 'dark') {
       const DARK_INVERT = 'filter:invert(1)hue-rotate(180deg)!important';
+      const LIGHT_BG = '#d6d5d2';
       themeStyle.textContent = [
-        `html{${DARK_INVERT};background:#d6d5d2!important}`,
-        `body{background:#d6d5d2!important}`,
-        `img,video,canvas,svg,iframe,picture,[style*="background-image"]{${DARK_INVERT}}`,
+        `html{${DARK_INVERT};background:${LIGHT_BG}!important}`,
+        `body{background:${LIGHT_BG}!important}`,
+        `img,video,canvas,svg,iframe,picture,embed,object,[style*="background-image"],[role="img"]{${DARK_INVERT}}`,
+        `input,button,select,textarea{${DARK_INVERT}}`,
       ].join('');
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
