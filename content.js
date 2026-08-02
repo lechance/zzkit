@@ -78,8 +78,7 @@
       themeStyle.textContent = [
         `html{${DARK_INVERT};background:${LIGHT_BG}!important}`,
         `body{background:${LIGHT_BG}!important}`,
-        `img,video,canvas,svg,iframe,picture,embed,object,[style*="background-image"],[role="img"]{${DARK_INVERT}}`,
-        `input,button,select,textarea{${DARK_INVERT}}`,
+        `img,video,canvas,iframe,picture,embed,object,[style*="background-image"],[role="img"]{${DARK_INVERT}}`,
       ].join('');
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
