@@ -36,7 +36,7 @@ See `AGENTS.md` for the full architecture reference. Key structure:
 
 ## Theme
 
-`darkMode` (boolean) toggles dark theme on/off via a switch in the **Dark Mode** tab. On → invert filter on pages + dark popup; off → light. The switch auto-saves on toggle. Broadcasts via two paths: `chrome.storage.onChanged` + direct runtime `themeChanged` message to all tabs.
+`darkMode` (boolean) toggles dark theme on/off via a switch in the **Theme** tab. On → invert filter on pages + dark popup; off → light. The switch auto-saves on toggle. Broadcasts via two paths: `chrome.storage.onChanged` + direct runtime `themeChanged` message to all tabs.
 
 ## Version Bump
 

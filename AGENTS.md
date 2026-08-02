@@ -16,7 +16,7 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 |---|---|
 | `manifest.json` | MV3 manifest. Permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`, `privacy`. Host: `<all_urls>`. |
 | `background.js` | Service worker. Stores config in `chrome.storage.sync`. `chrome.alarms` for periodic cleanup. `chrome.browsingData.remove` for data removal. `chrome.privacy` for WebRTC IP handling policy. Broadcasts `themeChanged` to all tabs on config save. |
-| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default) and `:root.force-light`; the Dark Mode tab holds the on/off switch. |
+| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default) and `:root.force-light`; the Theme tab holds the Dark Mode switch. |
 | `content.js` | Content script on all URLs. Handles `clearTabData` (in-tab cleanup: localStorage, sessionStorage, IndexedDB via `webkitGetDatabaseNames`, cache) and `themeChanged` (applies dark/light/page theme via injected CSS). |
 | `icons/` | PNG icons (16, 48, 128). Optimized with `optipng -o7 -strip all`. |
 
