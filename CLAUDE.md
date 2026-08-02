@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-**Site Data Cleaner** — a Chrome MV3 extension that automatically clears site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals. Zero build system, zero dependencies, zero tests.
+**zzkit** — a Chrome MV3 extension that automatically clears site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals. Zero build system, zero dependencies, zero tests.
 
 ## Quick Start
 
@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Reload:** Click the refresh icon on the extension card, then reopen the popup.
 - **Debug popup:** Right-click extension icon → "Inspect popup".
 - **Debug service worker:** Click the "service worker" link on the extension card.
-- **Debug content script:** Open DevTools on any tab. Logs use `[SiteCleaner]` prefix.
+- **Debug content script:** Open DevTools on any tab. Logs use `[zzkit]` prefix.
 
 ## Architecture
 

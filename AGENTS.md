@@ -1,4 +1,4 @@
-# Site Data Cleaner – AGENTS.md
+# zzkit – AGENTS.md
 
 Chrome MV3 extension. No build system, no test runner, no package.json.
 
@@ -8,7 +8,7 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 - **Reload:** refresh icon on extension card, then reopen popup.
 - **Debug popup:** right-click icon > "Inspect popup".
 - **Debug service worker:** click "service worker" link on extension card.
-- **Debug content script:** DevTools on any tab. Logs use `[SiteCleaner]` prefix.
+- **Debug content script:** DevTools on any tab. Logs use `[zzkit]` prefix.
 
 ## Architecture
 

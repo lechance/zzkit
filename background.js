@@ -63,7 +63,7 @@ async function clearSiteData(origins, config) {
   const results = await Promise.allSettled(tasks);
   const failures = results.filter(r => r.status === 'rejected');
   if (failures.length > 0) {
-    console.warn('[SiteCleaner] Some cleanup tasks failed:', failures.map(f => f.reason));
+    console.warn('[zzkit] Some cleanup tasks failed:', failures.map(f => f.reason));
   }
 }
 
@@ -75,9 +75,9 @@ async function runCleanup() {
 
   try {
     await clearSiteData(origins, config);
-    console.log(`[SiteCleaner] Cleared data for ${origins.length > 1 ? 'all URLs' : origins[0]}`);
+    console.log(`[zzkit] Cleared data for ${origins.length > 1 ? 'all URLs' : origins[0]}`);
   } catch (err) {
-    console.error('[SiteCleaner] Cleanup failed:', err);
+    console.error('[zzkit] Cleanup failed:', err);
   }
 }
 
@@ -95,9 +95,9 @@ async function applyWebRTCPolicy(config) {
   }
   try {
     await chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: policy });
-    console.log(`[SiteCleaner] WebRTC IP handling policy set to '${policy}'`);
+    console.log(`[zzkit] WebRTC IP handling policy set to '${policy}'`);
   } catch (err) {
-    console.warn('[SiteCleaner] Failed to apply WebRTC IP handling policy:', err);
+    console.warn('[zzkit] Failed to apply WebRTC IP handling policy:', err);
   }
 }
 
