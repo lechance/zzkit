@@ -9,6 +9,7 @@ const DEFAULT_CONFIG = {
   origins: [],
   matchAllUrls: true,
   theme: 'system',
+  webrtcPolicy: 'default',
 };
 
 async function getConfig() {
@@ -87,6 +88,19 @@ async function scheduleAlarm(config) {
   }
 }
 
+async function applyWebRTCPolicy(config) {
+  const policy = config.webrtcPolicy || 'default';
+  if (!chrome.privacy?.network?.webRTCIPHandlingPolicy) {
+    return; // Not available (Firefox, older Chrome, or missing permission) — no-op
+  }
+  try {
+    await chrome.privacy.network.webRTCIPHandlingPolicy.set({ value: policy });
+    console.log(`[SiteCleaner] WebRTC IP handling policy set to '${policy}'`);
+  } catch (err) {
+    console.warn('[SiteCleaner] Failed to apply WebRTC IP handling policy:', err);
+  }
+}
+
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'siteCleanup') {
     runCleanup();
@@ -95,6 +109,7 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 
 chrome.runtime.onInstalled.addListener(async () => {
   const config = await getConfig();
+  await applyWebRTCPolicy(config);
   if (config.enabled) {
     await scheduleAlarm(config);
     runCleanup();
@@ -108,6 +123,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
   if (message.type === 'updateConfig') {
     saveConfig(message.config).then(async () => {
+      await applyWebRTCPolicy(message.config);
       await scheduleAlarm(message.config);
       chrome.tabs.query({}, tabs => {
         for (const tab of tabs) {

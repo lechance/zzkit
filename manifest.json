@@ -1,14 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Site Data Cleaner",
-  "version": "1.4",
+  "version": "1.5",
   "description": "Automatically clear site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals",
   "permissions": [
     "storage",
     "cookies",
     "browsingData",
     "alarms",
-    "tabs"
+    "tabs",
+    "privacy"
   ],
   "host_permissions": ["<all_urls>"],
   "background": {

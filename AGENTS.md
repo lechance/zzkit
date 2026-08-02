@@ -14,8 +14,8 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 
 | File | Role |
 |---|---|
-| `manifest.json` | MV3 manifest. Permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`. Host: `<all_urls>`. |
-| `background.js` | Service worker. Stores config in `chrome.storage.sync`. `chrome.alarms` for periodic cleanup. `chrome.browsingData.remove` for data removal. Broadcasts `themeChanged` to all tabs on config save. |
+| `manifest.json` | MV3 manifest. Permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`, `privacy`. Host: `<all_urls>`. |
+| `background.js` | Service worker. Stores config in `chrome.storage.sync`. `chrome.alarms` for periodic cleanup. `chrome.browsingData.remove` for data removal. `chrome.privacy` for WebRTC IP handling policy. Broadcasts `themeChanged` to all tabs on config save. |
 | `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default), `:root.force-light` override, and `@media (prefers-color-scheme: light)` for Auto mode. |
 | `content.js` | Content script on all URLs. Handles `clearTabData` (in-tab cleanup: localStorage, sessionStorage, IndexedDB via `webkitGetDatabaseNames`, cache) and `themeChanged` (applies dark/light/page theme via injected CSS). |
 | `icons/` | PNG icons (16, 48, 128). Optimized with `optipng -o7 -strip all`. |
@@ -62,3 +62,4 @@ Every commit increments `version` in `manifest.json` by +1 (minor bump). Current
 - IndexedDB via `browsingData` only works per-origin (loops over origins). When `matchAllUrls`, uses single `<all_urls>` call.
 - `chrome.runtime.onInstalled` listener starts cleanup if extension was enabled before browser restart.
 - `updateConfig` handler saves config, reschedules alarm, then broadcasts `themeChanged` to all tabs (silently catches errors for tabs without content script).
+- WebRTC IP handling policy (`chrome.privacy.network.webRTCIPHandlingPolicy`, config field `webrtcPolicy`) is applied via `applyWebRTCPolicy()` on config save and on install/update. Feature-detected (no-op if unavailable); setting persists at browser level after uninstall (no MV3 uninstall hook). `'default'` = off.

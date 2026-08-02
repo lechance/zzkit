@@ -13,6 +13,7 @@ async function loadConfig() {
   el('clearCache').checked = resp.clearCache;
   el('matchAllUrls').checked = resp.matchAllUrls;
   el('origins').value = (resp.origins || []).join('\n');
+  el('webrtcPolicy').value = resp.webrtcPolicy || 'default';
   updateUI(resp);
   currentTheme = resp.theme || 'system';
   applyTheme(currentTheme);
@@ -40,6 +41,7 @@ function collectConfig() {
     matchAllUrls: el('matchAllUrls').checked,
     origins: el('origins').value.split('\n').map(s => s.trim()).filter(Boolean),
     theme: currentTheme,
+    webrtcPolicy: el('webrtcPolicy').value,
   };
 }
 

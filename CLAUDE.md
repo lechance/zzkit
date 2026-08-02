@@ -20,7 +20,7 @@ See `AGENTS.md` for the full architecture reference. Key structure:
 
 | File | Role |
 |---|---|
-| `manifest.json` | MV3 manifest — permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs` |
+| `manifest.json` | MV3 manifest — permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`, `privacy` |
 | `background.js` | Service worker — config persistence (`chrome.storage.sync`), alarm-based periodic cleanup (`chrome.browsingData.remove`), message hub |
 | `popup.html` / `popup.js` | Popup UI — reads/writes config via `chrome.runtime.sendMessage`, toggles theme, triggers manual cleanup |
 | `content.js` | Content script (all URLs) — in-tab data clearing (`localStorage.clear()`, `indexedDB.deleteDatabase()`, etc.) and theme injection (dark/light/page modes via injected CSS) |
@@ -31,6 +31,7 @@ See `AGENTS.md` for the full architecture reference. Key structure:
 - Persisted in `chrome.storage.sync` as `{config: {...}}`.
 - Defaults defined in `DEFAULT_CONFIG` at the top of `background.js`.
 - When adding a new config field: add it to `DEFAULT_CONFIG`, wire it in `loadConfig()` (read from storage into DOM), `collectConfig()` (read from DOM into object), and `updateUI()` (reflect in UI).
+- `webrtcPolicy` (WebRTC IP handling dropdown) is applied via `chrome.privacy.network.webRTCIPHandlingPolicy` on save/install — not part of cleanup logic.
 
 ## Theme
 
@@ -44,5 +45,5 @@ Every commit increments `version` in `manifest.json` by +1 (minor bump).
 
 - **Cleanup:** `background.js` sends `chrome.browsingData.remove()` calls in parallel (`Promise.allSettled`). `content.js` handles in-tab fallbacks (localStorage, sessionStorage, IndexedDB via `webkitGetDatabaseNames`, cache API).
 - **IndexedDB quirk:** `browsingData` only works per-origin — loops over origins individually. When `matchAllUrls`, uses single `<all_urls>` call.
-- **Message types:** `runCleanupNow`, `updateConfig`, `getConfig` (background.js) and `clearTabData`, `themeChanged` (content.js).
+- **Message types:** `runCleanupNow`, `updateConfig`, `getConfig` (background.js) and `clearTabData`, `themeChanged` (content.js). `updateConfig` also applies the WebRTC policy as a side effect.
 - **Popup UI:** No on-the-fly validation. `matchAllUrls` toggles the custom origins textarea visibility in real-time.
