@@ -32,10 +32,11 @@ See `AGENTS.md` for the full architecture reference. Key structure:
 - Defaults defined in `DEFAULT_CONFIG` at the top of `background.js`.
 - When adding a new config field: add it to `DEFAULT_CONFIG`, wire it in `loadConfig()` (read from storage into DOM), `collectConfig()` (read from DOM into object), and `updateUI()` (reflect in UI).
 - `webrtcPolicy` (WebRTC IP handling dropdown) is applied via `chrome.privacy.network.webRTCIPHandlingPolicy` on save/install — not part of cleanup logic.
+- `darkMode` (Dark Mode switch, boolean) is broadcast as a `themeChanged` `'dark'`/`'light'` message on save/toggle — not part of cleanup logic.
 
 ## Theme
 
-Cycle: Auto → Dark → Light → Off → Auto. Theme broadcasts via two paths: `chrome.storage.onChanged` + direct runtime `themeChanged` message to all tabs. See `AGENTS.md` for the full theme table.
+`darkMode` (boolean) toggles dark theme on/off via a switch in the **Dark Mode** tab. On → invert filter on pages + dark popup; off → light. The switch auto-saves on toggle. Broadcasts via two paths: `chrome.storage.onChanged` + direct runtime `themeChanged` message to all tabs.
 
 ## Version Bump
 

@@ -16,7 +16,7 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 |---|---|
 | `manifest.json` | MV3 manifest. Permissions: `storage`, `cookies`, `browsingData`, `alarms`, `tabs`, `privacy`. Host: `<all_urls>`. |
 | `background.js` | Service worker. Stores config in `chrome.storage.sync`. `chrome.alarms` for periodic cleanup. `chrome.browsingData.remove` for data removal. `chrome.privacy` for WebRTC IP handling policy. Broadcasts `themeChanged` to all tabs on config save. |
-| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default), `:root.force-light` override, and `@media (prefers-color-scheme: light)` for Auto mode. |
+| `popup.html` / `popup.js` | Popup UI. Reads/writes config via `chrome.runtime.sendMessage`. Popup CSS uses `:root` (dark default) and `:root.force-light`; the Dark Mode tab holds the on/off switch. |
 | `content.js` | Content script on all URLs. Handles `clearTabData` (in-tab cleanup: localStorage, sessionStorage, IndexedDB via `webkitGetDatabaseNames`, cache) and `themeChanged` (applies dark/light/page theme via injected CSS). |
 | `icons/` | PNG icons (16, 48, 128). Optimized with `optipng -o7 -strip all`. |
 
@@ -24,22 +24,16 @@ Chrome MV3 extension. No build system, no test runner, no package.json.
 
 - `chrome.storage.sync`, keyed as `{config: {...}}`.
 - Defaults in `DEFAULT_CONFIG` at top of `background.js`.
-- `collectConfig()` in popup.js reads ALL fields from the DOM **plus** a `currentTheme` variable. If you add a new config field, add it to `DEFAULT_CONFIG`, the DOM read in `loadConfig`, and `collectConfig`.
+- `collectConfig()` in popup.js reads ALL fields from the DOM, including the `#darkModeSwitch`. If you add a new config field, add it to `DEFAULT_CONFIG`, the DOM read in `loadConfig`, and `collectConfig`.
 
-## Theme toggle (dark/light/system/off)
+## Dark mode
 
-Cycle: Auto → Dark → Light → Off → Auto.
-
-| Mode | Popup | Pages |
-|---|---|---|
-| **Auto** | Follows `@media (prefers-color-scheme)` | Follows system `matchMedia` — applies invert filter or color-scheme |
-| **Dark** | `:root` (default, no forced class needed) | `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`; re-inverts `img,video,canvas,svg,iframe,picture,[style*="background-image"]`; also sets `body{background:#d6d5d2}` to cover pages that only color `<body>` |
-| **Light** | `:root.force-light` | `color-scheme: light` on `<html>` |
-| **Off** | No forced class | Removes all injected CSS, `data-theme`, `color-scheme` |
-
-- Theme broadcasts via **two paths**: `chrome.storage.onChanged` (content script listener) **and** direct `themeChanged` runtime message (background sends to all tabs via `chrome.tabs.query({})`).
-- Content script's `effectiveTheme()` resolves `'system'` via `matchMedia`, and `'off'` returns `'system'` to skip injection.
-- Popup CSS variables are defined in 3 blocks: `:root` (dark default), `:root.force-light`, and `@media (prefers-color-scheme: light)` (for Auto when system is light). The `force-dark` class is still recognized but doesn't need its own block since `:root` is already dark.
+- Config field `darkMode` (boolean). On → dark theme everywhere; off → light theme everywhere.
+- **Popup:** `force-dark` class when on, `force-light` when off (shields the popup from the `@media (prefers-color-scheme: light)` auto block).
+- **Pages:** `themeChanged` message carries `'dark'`/`'light'`; content script injects the invert-filter (dark) or `color-scheme: light` (light) styles.
+- Broadcast via **two paths**: `chrome.storage.onChanged` (content script listener) **and** direct `themeChanged` runtime message (background sends to all tabs via `chrome.tabs.query({})`).
+- The Dark Mode switch **auto-saves** (sends `updateConfig` on toggle); `collectConfig()` reads `#darkModeSwitch`.
+- Popup CSS variables: `:root` (dark default) and `:root.force-light`. Dark injection: `filter: invert(1) hue-rotate(180deg)` on `<html>` with `!important`, re-inverting `img,video,canvas,svg,iframe,picture,[style*="background-image"]`, plus `body{background:#d6d5d2}` for pages that only color `<body>`.
 
 ## Version bump convention
 

@@ -1,7 +1,5 @@
 function el(id) { return document.getElementById(id); }
 
-let currentTheme = 'system';
-
 async function loadConfig() {
   const resp = await chrome.runtime.sendMessage({ type: 'getConfig' });
   el('enabled').checked = resp.enabled;
@@ -14,9 +12,9 @@ async function loadConfig() {
   el('matchAllUrls').checked = resp.matchAllUrls;
   el('origins').value = (resp.origins || []).join('\n');
   el('webrtcPolicy').value = resp.webrtcPolicy || 'default';
+  el('darkModeSwitch').checked = !!resp.darkMode;
   updateUI(resp);
-  currentTheme = resp.theme || 'system';
-  applyTheme(currentTheme);
+  applyDarkMode(el('darkModeSwitch').checked);
 }
 
 function updateUI(config) {
@@ -57,7 +55,7 @@ function collectConfig() {
     clearCache: el('clearCache').checked,
     matchAllUrls: el('matchAllUrls').checked,
     origins: el('origins').value.split('\n').map(s => s.trim()).filter(Boolean),
-    theme: currentTheme,
+    darkMode: el('darkModeSwitch').checked,
     webrtcPolicy: el('webrtcPolicy').value,
   };
 }
@@ -74,24 +72,14 @@ el('cleanNowBtn').addEventListener('click', async () => {
   showStatus('Cleaned ✓', '#81c784');
 });
 
-el('themeToggle').addEventListener('click', async () => {
-  const resp = await chrome.runtime.sendMessage({ type: 'getConfig' });
-  const cycle = { system: 'dark', dark: 'light', light: 'off', off: 'system' };
-  const next = cycle[resp.theme] || 'system';
-  await chrome.runtime.sendMessage({ type: 'updateConfig', config: { ...resp, theme: next } });
-  applyTheme(next);
+el('darkModeSwitch').addEventListener('change', async () => {
+  applyDarkMode(el('darkModeSwitch').checked);
+  await chrome.runtime.sendMessage({ type: 'updateConfig', config: collectConfig() });
 });
 
-function applyTheme(theme) {
-  currentTheme = theme;
-  const root = document.documentElement;
-  root.classList.remove('force-dark', 'force-light');
-  if (theme === 'dark') root.classList.add('force-dark');
-  else if (theme === 'light') root.classList.add('force-light');
-
-  const btn = el('themeToggle');
-  const labels = { system: 'Auto', dark: '☾ Dark', light: '☀ Light', off: '✕ Off' };
-  btn.textContent = labels[theme] || 'Auto';
+function applyDarkMode(on) {
+  document.documentElement.classList.toggle('force-dark', !!on);
+  document.documentElement.classList.toggle('force-light', !on);
 }
 
 function showStatus(msg, color) {

@@ -95,13 +95,13 @@
   (async () => {
     const data = await chrome.storage.sync.get('config');
     const config = data.config || {};
-    injectTheme(effectiveTheme(config.theme || 'system'));
+    injectTheme(config.darkMode ? 'dark' : 'light');
   })();
 
   chrome.storage.onChanged.addListener((changes, area) => {
     if (area === 'sync' && changes.config) {
       const newVal = changes.config.newValue || {};
-      injectTheme(effectiveTheme(newVal.theme || 'system'));
+      injectTheme(newVal.darkMode ? 'dark' : 'light');
     }
   });
 })();

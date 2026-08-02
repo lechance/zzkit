@@ -8,7 +8,7 @@ const DEFAULT_CONFIG = {
   clearCache: true,
   origins: [],
   matchAllUrls: true,
-  theme: 'system',
+  darkMode: false,
   webrtcPolicy: 'default',
 };
 
@@ -127,7 +127,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       await scheduleAlarm(message.config);
       chrome.tabs.query({}, tabs => {
         for (const tab of tabs) {
-          chrome.tabs.sendMessage(tab.id, { type: 'themeChanged', theme: message.config.theme }).catch(() => {});
+          chrome.tabs.sendMessage(tab.id, { type: 'themeChanged', theme: message.config.darkMode ? 'dark' : 'light' }).catch(() => {});
         }
       });
       sendResponse({ success: true });
