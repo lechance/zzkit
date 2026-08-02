@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "zzkit",
-  "version": "1.11",
+  "version": "1.12",
   "description": "Automatically clear site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals",
   "permissions": [
     "storage",
@@ -19,7 +19,7 @@
   "content_scripts": [{
     "matches": ["<all_urls>"],
     "js": ["content.js"],
-    "run_at": "document_idle"
+    "run_at": "document_start"
   }],
   "action": {
     "default_popup": "popup.html",

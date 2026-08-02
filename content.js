@@ -84,7 +84,7 @@
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
     }
-    document.head.appendChild(themeStyle);
+    (document.head || document.documentElement).appendChild(themeStyle);
   }
 
   function effectiveTheme(configTheme) {

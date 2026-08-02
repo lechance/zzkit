@@ -48,6 +48,7 @@ Every commit increments `version` in `manifest.json` by +1 (minor bump). Current
 ## Content script notes
 
 - Dark mode injects a `<style>` element with `filter: invert(1) hue-rotate(180deg)` on `<html>`, re-inverting media (`img,video,canvas,svg,iframe,picture,embed,object,[style*="background-image"],[role="img"]`) and form controls (`input,button,select,textarea`). Removes it on mode change. `!important` prevents page CSS from overriding.
+- Content script runs at `document_start` and appends the style to `document.head || document.documentElement`, so the dark filter is applied before first paint (avoids a white flash on reload).
 - Light mode injects `<style>html{color-scheme:light}</style>`.
 - Both `data-theme` attribute and `color-scheme` inline style are set on `<html>`.
 
