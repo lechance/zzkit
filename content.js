@@ -75,10 +75,15 @@
     if (theme === 'dark') {
       const DARK_INVERT = 'filter:invert(1)hue-rotate(180deg)!important';
       const LIGHT_BG = '#d6d5d2';
+      const MEDIA = 'img,video,canvas,iframe,picture,embed,object';
+      const NOT_MEDIA = ':not(img):not(video):not(canvas):not(iframe):not(picture):not(embed):not(object)';
       themeStyle.textContent = [
         `html{${DARK_INVERT};background:${LIGHT_BG}!important}`,
         `body{background:${LIGHT_BG}!important}`,
-        `img,video,canvas,iframe,picture,embed,object,[style*="background-image"],[role="img"]{${DARK_INVERT}}`,
+        `${MEDIA},svg:not([role="img"]),[style*="background-image"],[role="img"]{${DARK_INVERT}}`,
+        // Text inside re-inverted containers is flipped back to black by the rule above;
+        // re-invert it so originally-black text renders light again. Skip the media elements.
+        `[style*="background-image"] ${NOT_MEDIA},[role="img"] ${NOT_MEDIA}{${DARK_INVERT}}`,
       ].join('');
     } else {
       themeStyle.textContent = 'html{color-scheme:light}';
