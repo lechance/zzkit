@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "zzkit",
-  "version": "1.7",
+  "version": "1.8",
   "description": "Automatically clear site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals",
   "permissions": [
     "storage",

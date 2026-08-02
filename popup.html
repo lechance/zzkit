@@ -62,54 +62,64 @@
     .slash { color: var(--muted); }
     hr { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
     .theme-btn { background: none; border: 1px solid var(--border); border-radius: 5px; color: var(--text); cursor: pointer; font-size: 11px; padding: 3px 8px; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 8px; border-bottom: 1px solid var(--border); }
+    .tab-btn { background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; padding: 4px 10px; font-family: inherit; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); cursor: pointer; }
+    .tab-btn:hover { color: var(--heading); }
+    .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
   </style>
 </head>
 <body>
   <h2><span class="zz">Zz</span> zzkit</h2>
 
-  <div class="row" style="justify-content:flex-end; border:none; padding:0 0 6px;">
-    <button class="theme-btn" id="themeToggle">Auto</button>
+  <div class="tabs" role="tablist">
+    <button class="tab-btn active" data-tab="clean" role="tab" aria-selected="true">Clean</button>
+    <button class="tab-btn" data-tab="privacy" role="tab" aria-selected="false">Privacy</button>
+    <button class="tab-btn" data-tab="general" role="tab" aria-selected="false">General</button>
   </div>
 
-  <div class="row">
-    <label><input type="checkbox" id="enabled"> <strong>Enabled</strong></label>
-    <span class="badge" id="statusBadge">Off</span>
+  <div class="tab-panel active" data-panel="clean" role="tabpanel">
+    <div class="row">
+      <label><input type="checkbox" id="enabled"> <strong>Enabled</strong></label>
+      <span class="badge" id="statusBadge">Off</span>
+    </div>
+    <div class="row">
+      <label>Interval (minutes)</label>
+      <input type="number" id="intervalMinutes" min="1" max="1440" value="60">
+    </div>
+    <hr>
+    <div class="section-title">Data Types</div>
+    <div class="row"><label><input type="checkbox" id="clearLocalStorage" checked> Local Storage</label></div>
+    <div class="row"><label><input type="checkbox" id="clearSessionStorage" checked> Session Storage</label></div>
+    <div class="row"><label><input type="checkbox" id="clearIndexedDB" checked> IndexedDB</label></div>
+    <div class="row"><label><input type="checkbox" id="clearCookies" checked> Cookies</label></div>
+    <div class="row"><label><input type="checkbox" id="clearCache" checked> Cache Storage</label></div>
+    <hr>
+    <div class="section-title">Scope</div>
+    <div class="row"><label><input type="checkbox" id="matchAllUrls" checked> All URLs</label></div>
+    <div class="row" id="customOriginsRow" style="display:none; flex-direction:column; align-items:stretch; gap:4px; padding:4px 0;">
+      <label style="font-size:11px; color:var(--muted);">Custom origins (one per line):</label>
+      <textarea id="origins" rows="3" style="width:100%; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px; font-size:11px; resize:vertical;" placeholder="https://example.com&#10;https://another.com"></textarea>
+    </div>
   </div>
 
-  <div class="row">
-    <label>Interval (minutes)</label>
-    <input type="number" id="intervalMinutes" min="1" max="1440" value="60">
+  <div class="tab-panel" data-panel="privacy" role="tabpanel">
+    <div class="row">
+      <label for="webrtcPolicy" title="Controls which IP addresses WebRTC may expose (can prevent local/private IP leaks)">WebRTC IP handling</label>
+      <select id="webrtcPolicy">
+        <option value="default">Off (no restriction)</option>
+        <option value="default_public_and_private_interfaces">Use public &amp; private interfaces</option>
+        <option value="default_public_interface_only">Use public interface only</option>
+        <option value="disable_non_proxied_udp">Disable non-proxied UDP</option>
+      </select>
+    </div>
   </div>
 
-  <hr>
-
-  <div class="section-title">Data Types</div>
-  <div class="row"><label><input type="checkbox" id="clearLocalStorage" checked> Local Storage</label></div>
-  <div class="row"><label><input type="checkbox" id="clearSessionStorage" checked> Session Storage</label></div>
-  <div class="row"><label><input type="checkbox" id="clearIndexedDB" checked> IndexedDB</label></div>
-  <div class="row"><label><input type="checkbox" id="clearCookies" checked> Cookies</label></div>
-  <div class="row"><label><input type="checkbox" id="clearCache" checked> Cache Storage</label></div>
-
-  <hr>
-
-  <div class="section-title">Scope</div>
-  <div class="row"><label><input type="checkbox" id="matchAllUrls" checked> All URLs</label></div>
-  <div class="row" id="customOriginsRow" style="display:none; flex-direction:column; align-items:stretch; gap:4px; padding:4px 0;">
-    <label style="font-size:11px; color:var(--muted);">Custom origins (one per line):</label>
-    <textarea id="origins" rows="3" style="width:100%; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:4px; padding:4px; font-size:11px; resize:vertical;" placeholder="https://example.com&#10;https://another.com"></textarea>
-  </div>
-
-  <hr>
-
-  <div class="section-title">Privacy</div>
-  <div class="row">
-    <label for="webrtcPolicy" title="Controls which IP addresses WebRTC may expose (can prevent local/private IP leaks)">WebRTC IP handling</label>
-    <select id="webrtcPolicy">
-      <option value="default">Off (no restriction)</option>
-      <option value="default_public_and_private_interfaces">Use public &amp; private interfaces</option>
-      <option value="default_public_interface_only">Use public interface only</option>
-      <option value="disable_non_proxied_udp">Disable non-proxied UDP</option>
-    </select>
+  <div class="tab-panel" data-panel="general" role="tabpanel">
+    <div class="row" style="justify-content:flex-end; border:none; padding:0;">
+      <button class="theme-btn" id="themeToggle">Auto</button>
+    </div>
   </div>
 
   <div class="flex mt8" style="justify-content:space-between;">
