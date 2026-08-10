@@ -5,7 +5,7 @@ A Chrome extension that automatically clears site data (localStorage, sessionSto
 ## Features
 
 - **Scheduled cleanup** — clears site data on a timer (default 60 min), scoped to all URLs or a custom origin list.
-- **Dark mode** — one-click invert-filter dark theme across all pages, applied before first paint to avoid a white flash.
+- **Dark mode** — one-click invert-filter dark theme across all pages, applied before first paint to avoid a white flash, and leaves pages that are already dark (native or OS-following) untouched.
 - **WebRTC protection** — restrict which IP addresses WebRTC may expose.
 
 ## Install
