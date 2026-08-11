@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "zzkit",
-  "version": "1.20",
-  "description": "Automatically clear site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals",
+  "version": "1.21",
+  "description": "Scheduled site-data cleanup, invert-filter dark mode, and WebRTC IP-leak protection",
   "permissions": [
     "storage",
     "cookies",
