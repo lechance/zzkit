@@ -1,6 +1,6 @@
 # zzkit
 
-A Chrome extension that automatically clears site data (localStorage, sessionStorage, IndexedDB, cookies, cache storage) at configurable intervals, plus privacy extras: an invert-filter dark mode and WebRTC IP-leak prevention.
+A Chrome extension for scheduled site-data cleanup, an invert-filter dark mode, and WebRTC IP-leak protection.
 
 ## Features
 
