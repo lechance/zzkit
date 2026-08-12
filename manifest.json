@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "zzkit",
-  "version": "1.21",
+  "version": "1.22",
   "description": "Scheduled site-data cleanup, invert-filter dark mode, and WebRTC IP-leak protection",
   "permissions": [
     "storage",

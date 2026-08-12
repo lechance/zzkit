@@ -130,16 +130,20 @@
   function whenReady(cb) {
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', cb, { once: true });
+    } else if (document.readyState === 'interactive') {
+      // DCL already fired — the page's own background may not be applied yet.
+      // Wait for load so the measurement reads real (non-transparent) colors.
+      window.addEventListener('load', cb, { once: true });
     } else {
-      // Already interactive/complete (e.g. injected late after extension reload);
-      // let the current style recalc settle before measuring.
+      // Already complete — the page is fully rendered; just let the current
+      // style recalc settle before measuring.
       requestAnimationFrame(() => requestAnimationFrame(cb));
     }
   }
 
   function scheduleThemeMeasurement() {
     const token = themeToken;
-    whenReady(() => {
+    const check = () => {
       if (token !== themeToken) return;
       if (!darkEnabled) return;
       if (pageLooksDark()) {
@@ -150,7 +154,14 @@
         applyDarkFilter();
       }
       // OS-light branch: invertStyle already present — keep it.
-    });
+    };
+    whenReady(check);
+    // Re-check once the page is fully loaded: a measurement that ran too early
+    // (before the page's background applied) reads transparent and can wrongly
+    // classify an already-dark page as light; late-theming SPAs fix up here too.
+    if (document.readyState !== 'complete') {
+      window.addEventListener('load', check, { once: true });
+    }
   }
 
   function pageLooksDark() {
