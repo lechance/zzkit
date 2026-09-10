@@ -1,4 +1,60 @@
 (() => {
+  // DevTools guard - overrides site-level restrictions that block DevTools
+  // Must run at document_start to intercept page scripts before they load
+  (function injectDevToolsGuard() {
+    chrome.storage.sync.get('config', (data) => {
+      const config = data.config || {};
+      if (!config.allowDevTools) return;
+
+      // Override addEventListener to prevent pages from blocking DevTools shortcuts
+      const originalAddEventListener = EventTarget.prototype.addEventListener;
+      EventTarget.prototype.addEventListener = function(type, listener, options) {
+        if (type === 'keydown' || type === 'keypress' || type === 'keyup') {
+          const wrappedListener = function(e) {
+            // Check if this is a DevTools shortcut
+            const isDevToolsShortcut = (
+              e.key === 'F12' ||
+              (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase()))
+            );
+
+            if (isDevToolsShortcut) {
+              // Don't let pages block these shortcuts
+              e.stopImmediatePropagation();
+              return;
+            }
+
+            return listener.call(this, e);
+          };
+          return originalAddEventListener.call(this, type, wrappedListener, options);
+        }
+        return originalAddEventListener.call(this, type, listener, options);
+      };
+
+      // Override debugger detection
+      try {
+        Object.defineProperty(window, 'debugger', {
+          get: () => undefined,
+          configurable: true
+        });
+      } catch (e) {
+        // Some pages may have already defined this
+      }
+
+      // Override devtools detection
+      try {
+        const devtools = { isOpen: false, orientation: undefined };
+        Object.defineProperty(window, 'devtools', {
+          get: () => devtools,
+          configurable: true
+        });
+      } catch (e) {
+        // Some pages may have already defined this
+      }
+
+      console.log('[zzkit] DevTools guard enabled');
+    });
+  })();
+
   function deleteAllIndexedDB() {
     return new Promise((resolve) => {
       const req = indexedDB.webkitGetDatabaseNames

@@ -13,6 +13,7 @@ async function loadConfig() {
   el('origins').value = (resp.origins || []).join('\n');
   el('webrtcPolicy').value = resp.webrtcPolicy || 'default';
   el('darkModeSwitch').checked = !!resp.darkMode;
+  el('allowDevTools').checked = !!resp.allowDevTools;
   updateUI(resp);
   applyDarkMode(el('darkModeSwitch').checked);
 }
@@ -57,6 +58,7 @@ function collectConfig() {
     origins: el('origins').value.split('\n').map(s => s.trim()).filter(Boolean),
     darkMode: el('darkModeSwitch').checked,
     webrtcPolicy: el('webrtcPolicy').value,
+    allowDevTools: el('allowDevTools').checked,
   };
 }
 

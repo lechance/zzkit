@@ -10,6 +10,7 @@ const DEFAULT_CONFIG = {
   matchAllUrls: true,
   darkMode: false,
   webrtcPolicy: 'default',
+  allowDevTools: false,
 };
 
 async function getConfig() {
