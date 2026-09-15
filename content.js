@@ -124,6 +124,7 @@
   let bgStyle = null;     // dark only: html/body background override
   let themeToken = 0;     // bumped on every injectTheme(); stale async measurements bail
   let darkEnabled = false;
+  let bootFilterApplied = false; // true when synchronous dark filter was set at document_start
 
   function makeStyle(css) {
     const s = document.createElement('style');
@@ -163,7 +164,8 @@
   }
 
   function injectTheme(theme) {
-    removeStyles();
+    if (!bootFilterApplied) removeStyles();
+    bootFilterApplied = false;
     themeToken++;
     if (theme === 'system') {
       darkEnabled = false;
@@ -284,10 +286,21 @@
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 
+  // Apply dark filter synchronously at document_start to prevent white flash on
+  // refresh. Chrome can paint during the async config read below, so the filter
+  // must be in place before any yield. We always assume dark mode is on; if it
+  // turns out to be off, removeStyles() cleans up immediately after config read.
+  applyDarkFilter();
+  bootFilterApplied = true;
+
   (async () => {
     const data = await chrome.storage.sync.get('config');
     const config = data.config || {};
-    injectTheme(config.darkMode ? 'dark' : 'light');
+    if (!config.darkMode) {
+      removeStyles(); // Light mode — remove the synchronous dark filter
+    } else {
+      injectTheme('dark'); // bootFilterApplied → skips removeStyles(); measurement decides next
+    }
   })();
 
   chrome.storage.onChanged.addListener((changes, area) => {
