@@ -146,6 +146,7 @@
   // getComputedStyle().backgroundColor is unaffected by the filter property, so
   // the invert can stay applied during the measurement.
   function applyDarkFilter() {
+    removeStyles(); // clean up any existing styles (boot filter, prior dark, etc.)
     invertStyle = makeStyle(
       `html{${DARK_INVERT}}` +
       `${MEDIA},svg:not([role="img"]),[style*="background-image"],[role="img"]{${DARK_INVERT}}` +
@@ -159,6 +160,7 @@
   }
 
   function applyLightFilter() {
+    removeStyles(); // clean up any existing styles
     invertStyle = makeStyle('html{color-scheme:light}');
     appendStyle(invertStyle);
   }
