@@ -206,14 +206,15 @@
     const check = () => {
       if (token !== themeToken) return;
       if (!darkEnabled) return;
-      if (pageLooksDark()) {
+      const looks = pageLooksDark();
+      if (looks === 'dark') {
         // Site already renders dark — leave it alone (data-theme/color-scheme stay).
         removeStyles();
-      } else if (!invertStyle) {
+      } else if (looks === 'light' && !invertStyle) {
         // OS-dark branch: page is light, invert now.
         applyDarkFilter();
       }
-      // OS-light branch: invertStyle already present — keep it.
+      // 'light' with invertStyle present, or 'unknown' — keep the current state.
     };
     whenReady(check);
     // Re-check once the page is fully loaded: a measurement that ran too early
@@ -224,31 +225,52 @@
     }
   }
 
+  // Returns 'dark' | 'light' | 'unknown'. 'unknown' means the page is still
+  // fully transparent, so we keep the current filter and decide at load instead
+  // of dropping the invert prematurely (which caused a white flash on SPAs).
   function pageLooksDark() {
     const root = document.documentElement;
     const savedScheme = root.style.colorScheme;
     const hadBgStyle = !!bgStyle;
     if (hadBgStyle) bgStyle.remove(); // drop our override so we read the page's real color
     try {
-      let bg = null;
-      if (document.body) {
-        bg = parseColor(getComputedStyle(document.body).backgroundColor);
-        if (bg && bg.a < 0.5) bg = null;
-      }
+      let bg = opaqueBg(document.body) || opaqueBg(root);
       if (!bg) {
-        bg = parseColor(getComputedStyle(root).backgroundColor);
-        if (bg && bg.a < 0.5) bg = null;
+        // Background may be painted by a nested container (common in SPA shells
+        // such as OneDrive). Sample the viewport centre and walk up to the first
+        // opaque ancestor.
+        const w = window.innerWidth;
+        const h = window.innerHeight;
+        const el = w > 0 && h > 0
+          ? document.elementFromPoint(Math.floor(w / 2), Math.floor(h / 2))
+          : null;
+        for (let node = el; node && !bg; node = node.parentElement) {
+          bg = opaqueBg(node);
+        }
       }
-      if (bg) return luminance(bg) < DARK_THRESHOLD;
+      if (bg) return luminance(bg) < DARK_THRESHOLD ? 'dark' : 'light';
 
-      // Everything transparent — the canvas color follows the page's own color-scheme.
+      // Nothing opaque — fall back to the page's own color-scheme. 'dark' is an
+      // explicit native-dark signal; 'light dark' is ambiguous (the page may
+      // still render light regardless of the OS), so defer to the load re-check.
       root.style.colorScheme = ''; // clear OUR override so we read the page's own
       const scheme = getComputedStyle(root).colorScheme;
-      return scheme === 'dark' || (scheme === 'light dark' && OS_DARK_MQ.matches);
+      if (scheme === 'dark') return 'dark';
+      if (scheme === 'light') return 'light';
+      if (document.readyState === 'complete') {
+        return OS_DARK_MQ.matches ? 'dark' : 'light';
+      }
+      return 'unknown';
     } finally {
       root.style.colorScheme = savedScheme;
       if (hadBgStyle) appendStyle(bgStyle);
     }
+  }
+
+  function opaqueBg(el) {
+    if (!el) return null;
+    const bg = parseColor(getComputedStyle(el).backgroundColor);
+    return bg && bg.a >= 0.5 ? bg : null;
   }
 
   function parseColor(css) {
